@@ -5,14 +5,13 @@
 */
 
 #include "scanline_optimizer.h"
-
 #include <cassert>
 
-ScanlineOptimizer::ScanlineOptimizer(): width_(0), height_(0), img_left_(nullptr), img_right_(nullptr),
-                                        cost_init_(nullptr), cost_aggr_(nullptr),
-                                        min_disparity_(0), max_disparity_(0),
-                                        so_p1_(0), so_p2_(0),
-                                        so_tso_(0) {}
+ScanlineOptimizer::ScanlineOptimizer() : width_(0), height_(0), img_left_(nullptr), img_right_(nullptr),
+cost_init_(nullptr), cost_aggr_(nullptr),
+min_disparity_(0), max_disparity_(0),
+so_p1_(0), so_p2_(0),
+so_tso_(0) {}
 
 ScanlineOptimizer::~ScanlineOptimizer() {}
 
@@ -44,12 +43,12 @@ void ScanlineOptimizer::Optimize()
 		cost_init_ == nullptr || cost_aggr_ == nullptr) {
 		return;
 	}
-	
-	// 4æ–¹å‘æ‰«æçº¿ä¼˜åŒ–
-	// æ¨¡å—çš„é¦–æ¬¡è¾“å…¥æ˜¯ä¸Šä¸€æ­¥ä»£ä»·èšåˆåçš„æ•°æ®ï¼Œä¹Ÿå°±æ˜¯cost_aggr_
-	// æˆ‘ä»¬æŠŠå››ä¸ªæ–¹å‘çš„ä¼˜åŒ–æŒ‰æ¬¡åºè¿›è¡Œï¼Œå¹¶åˆ©ç”¨cost_init_åŠcost_aggr_é—´æ¬¡ä¿å­˜ä¸´æ—¶æ•°æ®ï¼Œè¿™æ ·ä¸ç”¨å¼€è¾Ÿé¢å¤–çš„å†…å­˜æ¥å­˜å‚¨ä¸­é—´ç»“æœ
-	// æ¨¡å—çš„æœ€ç»ˆè¾“å‡ºä¹Ÿæ˜¯cost_aggr_
-	
+
+	// 4·½ÏòÉ¨ÃèÏßÓÅ»¯
+	// Ä£¿éµÄÊ×´ÎÊäÈëÊÇÉÏÒ»²½´ú¼Û¾ÛºÏºóµÄÊı¾İ£¬Ò²¾ÍÊÇcost_aggr_
+	// ÎÒÃÇ°ÑËÄ¸ö·½ÏòµÄÓÅ»¯°´´ÎĞò½øĞĞ£¬²¢ÀûÓÃcost_init_¼°cost_aggr_¼ä´Î±£´æÁÙÊ±Êı¾İ£¬ÕâÑù²»ÓÃ¿ª±Ù¶îÍâµÄÄÚ´æÀ´´æ´¢ÖĞ¼ä½á¹û
+	// Ä£¿éµÄ×îÖÕÊä³öÒ²ÊÇcost_aggr_
+
 	// left to right
 	ScanlineOptimizeLeftRight(cost_aggr_, cost_init_, true);
 	// right to left
@@ -69,33 +68,33 @@ void ScanlineOptimizer::ScanlineOptimizeLeftRight(const float32* cost_so_src, fl
 	const auto p1 = so_p1_;
 	const auto p2 = so_p2_;
 	const auto tso = so_tso_;
-	
+
 	assert(width > 0 && height > 0 && max_disparity > min_disparity);
 
-	// è§†å·®èŒƒå›´
+	// ÊÓ²î·¶Î§
 	const sint32 disp_range = max_disparity - min_disparity;
 
-	// æ­£å‘(å·¦->å³) ï¼šis_forward = true ; direction = 1
-	// åå‘(å³->å·¦) ï¼šis_forward = false; direction = -1;
+	// ÕıÏò(×ó->ÓÒ) £ºis_forward = true ; direction = 1
+	// ·´Ïò(ÓÒ->×ó) £ºis_forward = false; direction = -1;
 	const sint32 direction = is_forward ? 1 : -1;
 
-	// èšåˆ
+	// ¾ÛºÏ
 	for (sint32 y = 0u; y < height; y++) {
-		// è·¯å¾„å¤´ä¸ºæ¯ä¸€è¡Œçš„é¦–(å°¾,dir=-1)åˆ—åƒç´ 
+		// Â·¾¶Í·ÎªÃ¿Ò»ĞĞµÄÊ×(Î²,dir=-1)ÁĞÏñËØ
 		auto cost_init_row = (is_forward) ? (cost_so_src + y * width * disp_range) : (cost_so_src + y * width * disp_range + (width - 1) * disp_range);
 		auto cost_aggr_row = (is_forward) ? (cost_so_dst + y * width * disp_range) : (cost_so_dst + y * width * disp_range + (width - 1) * disp_range);
 		auto img_row = (is_forward) ? (img_left_ + y * width * 3) : (img_left_ + y * width * 3 + 3 * (width - 1));
 		const auto img_row_r = img_right_ + y * width * 3;
 		sint32 x = (is_forward) ? 0 : width - 1;
 
-		// è·¯å¾„ä¸Šå½“å‰é¢œè‰²å€¼å’Œä¸Šä¸€ä¸ªé¢œè‰²å€¼
+		// Â·¾¶ÉÏµ±Ç°ÑÕÉ«ÖµºÍÉÏÒ»¸öÑÕÉ«Öµ
 		ADColor color(img_row[0], img_row[1], img_row[2]);
 		ADColor color_last = color;
 
-		// è·¯å¾„ä¸Šä¸Šä¸ªåƒç´ çš„ä»£ä»·æ•°ç»„ï¼Œå¤šä¸¤ä¸ªå…ƒç´ æ˜¯ä¸ºäº†é¿å…è¾¹ç•Œæº¢å‡ºï¼ˆé¦–å°¾å„å¤šä¸€ä¸ªï¼‰
+		// Â·¾¶ÉÏÉÏ¸öÏñËØµÄ´ú¼ÛÊı×é£¬¶àÁ½¸öÔªËØÊÇÎªÁË±ÜÃâ±ß½çÒç³ö£¨Ê×Î²¸÷¶àÒ»¸ö£©
 		std::vector<float32> cost_last_path(disp_range + 2, Large_Float);
 
-		// åˆå§‹åŒ–ï¼šç¬¬ä¸€ä¸ªåƒç´ çš„èšåˆä»£ä»·å€¼ç­‰äºåˆå§‹ä»£ä»·å€¼
+		// ³õÊ¼»¯£ºµÚÒ»¸öÏñËØµÄ¾ÛºÏ´ú¼ÛÖµµÈÓÚ³õÊ¼´ú¼ÛÖµ
 		memcpy(cost_aggr_row, cost_init_row, disp_range * sizeof(float32));
 		memcpy(&cost_last_path[1], cost_aggr_row, disp_range * sizeof(float32));
 		cost_init_row += direction * disp_range;
@@ -103,13 +102,13 @@ void ScanlineOptimizer::ScanlineOptimizeLeftRight(const float32* cost_so_src, fl
 		img_row += direction * 3;
 		x += direction;
 
-		// è·¯å¾„ä¸Šä¸Šä¸ªåƒç´ çš„æœ€å°ä»£ä»·å€¼
+		// Â·¾¶ÉÏÉÏ¸öÏñËØµÄ×îĞ¡´ú¼ÛÖµ
 		float32 mincost_last_path = Large_Float;
 		for (auto cost : cost_last_path) {
 			mincost_last_path = std::min(mincost_last_path, cost);
 		}
 
-		// è‡ªæ–¹å‘ä¸Šç¬¬2ä¸ªåƒç´ å¼€å§‹æŒ‰é¡ºåºèšåˆ
+		// ×Ô·½ÏòÉÏµÚ2¸öÏñËØ¿ªÊ¼°´Ë³Ğò¾ÛºÏ
 		for (sint32 j = 0; j < width - 1; j++) {
 			color = ADColor(img_row[0], img_row[1], img_row[2]);
 			const uint8 d1 = ColorDist(color, color_last);
@@ -125,7 +124,7 @@ void ScanlineOptimizer::ScanlineOptimizeLeftRight(const float32* cost_so_src, fl
 					d2 = ColorDist(color_r, color_last_r);
 				}
 
-				// è®¡ç®—P1å’ŒP2
+				// ¼ÆËãP1ºÍP2
 				float32 P1(0.0f), P2(0.0f);
 				if (d1 < tso && d2 < tso) {
 					P1 = p1; P2 = p2;
@@ -154,17 +153,17 @@ void ScanlineOptimizer::ScanlineOptimizeLeftRight(const float32* cost_so_src, fl
 				min_cost = std::min(min_cost, cost_s);
 			}
 
-			// é‡ç½®ä¸Šä¸ªåƒç´ çš„æœ€å°ä»£ä»·å€¼å’Œä»£ä»·æ•°ç»„
+			// ÖØÖÃÉÏ¸öÏñËØµÄ×îĞ¡´ú¼ÛÖµºÍ´ú¼ÛÊı×é
 			mincost_last_path = min_cost;
 			memcpy(&cost_last_path[1], cost_aggr_row, disp_range * sizeof(float32));
 
-			// ä¸‹ä¸€ä¸ªåƒç´ 
+			// ÏÂÒ»¸öÏñËØ
 			cost_init_row += direction * disp_range;
 			cost_aggr_row += direction * disp_range;
 			img_row += direction * 3;
 			x += direction;
 
-			// åƒç´ å€¼é‡æ–°èµ‹å€¼
+			// ÏñËØÖµÖØĞÂ¸³Öµ
 			color_last = color;
 		}
 	}
@@ -179,32 +178,32 @@ void ScanlineOptimizer::ScanlineOptimizeUpDown(const float32* cost_so_src, float
 	const auto p1 = so_p1_;
 	const auto p2 = so_p2_;
 	const auto tso = so_tso_;
-	
+
 	assert(width > 0 && height > 0 && max_disparity > min_disparity);
 
-	// è§†å·®èŒƒå›´
+	// ÊÓ²î·¶Î§
 	const sint32 disp_range = max_disparity - min_disparity;
 
-	// æ­£å‘(ä¸Š->ä¸‹) ï¼šis_forward = true ; direction = 1
-	// åå‘(ä¸‹->ä¸Š) ï¼šis_forward = false; direction = -1;
+	// ÕıÏò(ÉÏ->ÏÂ) £ºis_forward = true ; direction = 1
+	// ·´Ïò(ÏÂ->ÉÏ) £ºis_forward = false; direction = -1;
 	const sint32 direction = is_forward ? 1 : -1;
 
-	// èšåˆ
+	// ¾ÛºÏ
 	for (sint32 x = 0; x < width; x++) {
-		// è·¯å¾„å¤´ä¸ºæ¯ä¸€åˆ—çš„é¦–(å°¾,dir=-1)è¡Œåƒç´ 
+		// Â·¾¶Í·ÎªÃ¿Ò»ÁĞµÄÊ×(Î²,dir=-1)ĞĞÏñËØ
 		auto cost_init_col = (is_forward) ? (cost_so_src + x * disp_range) : (cost_so_src + (height - 1) * width * disp_range + x * disp_range);
 		auto cost_aggr_col = (is_forward) ? (cost_so_dst + x * disp_range) : (cost_so_dst + (height - 1) * width * disp_range + x * disp_range);
 		auto img_col = (is_forward) ? (img_left_ + 3 * x) : (img_left_ + (height - 1) * width * 3 + 3 * x);
 		sint32 y = (is_forward) ? 0 : height - 1;
 
-		// è·¯å¾„ä¸Šå½“å‰ç°åº¦å€¼å’Œä¸Šä¸€ä¸ªç°åº¦å€¼
+		// Â·¾¶ÉÏµ±Ç°»Ò¶ÈÖµºÍÉÏÒ»¸ö»Ò¶ÈÖµ
 		ADColor color(img_col[0], img_col[1], img_col[2]);
 		ADColor color_last = color;
 
-		// è·¯å¾„ä¸Šä¸Šä¸ªåƒç´ çš„ä»£ä»·æ•°ç»„ï¼Œå¤šä¸¤ä¸ªå…ƒç´ æ˜¯ä¸ºäº†é¿å…è¾¹ç•Œæº¢å‡ºï¼ˆé¦–å°¾å„å¤šä¸€ä¸ªï¼‰
+		// Â·¾¶ÉÏÉÏ¸öÏñËØµÄ´ú¼ÛÊı×é£¬¶àÁ½¸öÔªËØÊÇÎªÁË±ÜÃâ±ß½çÒç³ö£¨Ê×Î²¸÷¶àÒ»¸ö£©
 		std::vector<float32> cost_last_path(disp_range + 2, Large_Float);
 
-		// åˆå§‹åŒ–ï¼šç¬¬ä¸€ä¸ªåƒç´ çš„èšåˆä»£ä»·å€¼ç­‰äºåˆå§‹ä»£ä»·å€¼
+		// ³õÊ¼»¯£ºµÚÒ»¸öÏñËØµÄ¾ÛºÏ´ú¼ÛÖµµÈÓÚ³õÊ¼´ú¼ÛÖµ
 		memcpy(cost_aggr_col, cost_init_col, disp_range * sizeof(float32));
 		memcpy(&cost_last_path[1], cost_aggr_col, disp_range * sizeof(float32));
 		cost_init_col += direction * width * disp_range;
@@ -212,13 +211,13 @@ void ScanlineOptimizer::ScanlineOptimizeUpDown(const float32* cost_so_src, float
 		img_col += direction * width * 3;
 		y += direction;
 
-		// è·¯å¾„ä¸Šä¸Šä¸ªåƒç´ çš„æœ€å°ä»£ä»·å€¼
+		// Â·¾¶ÉÏÉÏ¸öÏñËØµÄ×îĞ¡´ú¼ÛÖµ
 		float32 mincost_last_path = Large_Float;
 		for (auto cost : cost_last_path) {
 			mincost_last_path = std::min(mincost_last_path, cost);
 		}
 
-		// è‡ªæ–¹å‘ä¸Šç¬¬2ä¸ªåƒç´ å¼€å§‹æŒ‰é¡ºåºèšåˆ
+		// ×Ô·½ÏòÉÏµÚ2¸öÏñËØ¿ªÊ¼°´Ë³Ğò¾ÛºÏ
 		for (sint32 i = 0; i < height - 1; i++) {
 			color = ADColor(img_col[0], img_col[1], img_col[2]);
 			const uint8 d1 = ColorDist(color, color_last);
@@ -233,7 +232,7 @@ void ScanlineOptimizer::ScanlineOptimizeUpDown(const float32* cost_so_src, float
 						img_right_[(y - direction) * width * 3 + 3 * xr + 2]);
 					d2 = ColorDist(color_r, color_last_r);
 				}
-				// è®¡ç®—P1å’ŒP2
+				// ¼ÆËãP1ºÍP2
 				float32 P1(0.0f), P2(0.0f);
 				if (d1 < tso && d2 < tso) {
 					P1 = p1; P2 = p2;
@@ -262,17 +261,17 @@ void ScanlineOptimizer::ScanlineOptimizeUpDown(const float32* cost_so_src, float
 				min_cost = std::min(min_cost, cost_s);
 			}
 
-			// é‡ç½®ä¸Šä¸ªåƒç´ çš„æœ€å°ä»£ä»·å€¼å’Œä»£ä»·æ•°ç»„
+			// ÖØÖÃÉÏ¸öÏñËØµÄ×îĞ¡´ú¼ÛÖµºÍ´ú¼ÛÊı×é
 			mincost_last_path = min_cost;
 			memcpy(&cost_last_path[1], cost_aggr_col, disp_range * sizeof(float32));
 
-			// ä¸‹ä¸€ä¸ªåƒç´ 
+			// ÏÂÒ»¸öÏñËØ
 			cost_init_col += direction * width * disp_range;
 			cost_aggr_col += direction * width * disp_range;
 			img_col += direction * width * 3;
 			y += direction;
 
-			// åƒç´ å€¼é‡æ–°èµ‹å€¼
+			// ÏñËØÖµÖØĞÂ¸³Öµ
 			color_last = color;
 		}
 	}

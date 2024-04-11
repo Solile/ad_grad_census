@@ -1,29 +1,29 @@
 #include "adcensus_util.h"
 #include <cassert>
 
-void adcensus_util::census_transform_5x5(const uint8 *source, vector<uint32> &census, const sint32 &width, const sint32 &height)
+void adcensus_util::census_transform_5x5(const uint8* source, vector<uint32>& census, const sint32& width, const sint32& height)
 {
 	if (source == nullptr || census.empty() || width <= 5u || height <= 5u)
 	{
 		return;
 	}
 
-	// é€åƒç´ è®¡ç®—censuså€¼
+	// ÖğÏñËØ¼ÆËãcensusÖµ
 	for (sint32 i = 2; i < height - 2; i++)
 	{
 		for (sint32 j = 2; j < width - 2; j++)
 		{
 
-			// ä¸­å¿ƒåƒç´ å€¼
+			// ÖĞĞÄÏñËØÖµ
 			const uint8 gray_center = source[i * width + j];
 
-			// éå†å¤§å°ä¸º5x5çš„çª—å£å†…é‚»åŸŸåƒç´ ï¼Œé€ä¸€æ¯”è¾ƒåƒç´ å€¼ä¸ä¸­å¿ƒåƒç´ å€¼çš„çš„å¤§å°ï¼Œè®¡ç®—censuså€¼
+			// ±éÀú´óĞ¡Îª5x5µÄ´°¿ÚÄÚÁÚÓòÏñËØ£¬ÖğÒ»±È½ÏÏñËØÖµÓëÖĞĞÄÏñËØÖµµÄµÄ´óĞ¡£¬¼ÆËãcensusÖµ
 			uint32 census_val = 0u;
 			for (sint32 r = -2; r <= 2; r++)
 			{
 				for (sint32 c = -2; c <= 2; c++)
 				{
-					census_val <<= 1; // å·¦ç§» value*2
+					census_val <<= 1; // ×óÒÆ value*2
 					const uint8 gray = source[(i + r) * width + j + c];
 					if (gray < gray_center)
 					{
@@ -32,29 +32,29 @@ void adcensus_util::census_transform_5x5(const uint8 *source, vector<uint32> &ce
 				}
 			}
 
-			// ä¸­å¿ƒåƒç´ çš„censuså€¼
+			// ÖĞĞÄÏñËØµÄcensusÖµ
 			census[i * width + j] = census_val;
 		}
 	}
 };
 
-void adcensus_util::census_transform_9x7(const uint8 *source, vector<uint64> &census, const sint32 &width, const sint32 &height)
+void adcensus_util::census_transform_9x7(const uint8* source, vector<uint64>& census, const sint32& width, const sint32& height)
 {
 	if (source == nullptr || census.empty() || width <= 9 || height <= 7)
 	{
 		return;
 	}
 
-	// é€åƒç´ è®¡ç®—censuså€¼
+	// ÖğÏñËØ¼ÆËãcensusÖµ
 	for (sint32 i = 4; i < height - 4; i++)
 	{
 		for (sint32 j = 3; j < width - 3; j++)
 		{
 
-			// ä¸­å¿ƒåƒç´ å€¼
+			// ÖĞĞÄÏñËØÖµ
 			const uint8 gray_center = source[i * width + j];
 
-			// éå†å¤§å°ä¸º9x7çš„çª—å£å†…é‚»åŸŸåƒç´ ï¼Œé€ä¸€æ¯”è¾ƒåƒç´ å€¼ä¸ä¸­å¿ƒåƒç´ å€¼çš„çš„å¤§å°ï¼Œè®¡ç®—censuså€¼
+			// ±éÀú´óĞ¡Îª9x7µÄ´°¿ÚÄÚÁÚÓòÏñËØ£¬ÖğÒ»±È½ÏÏñËØÖµÓëÖĞĞÄÏñËØÖµµÄµÄ´óĞ¡£¬¼ÆËãcensusÖµ
 			uint64 census_val = 0u;
 			for (sint32 r = -4; r <= 4; r++)
 			{
@@ -69,37 +69,37 @@ void adcensus_util::census_transform_9x7(const uint8 *source, vector<uint64> &ce
 				}
 			}
 
-			// ä¸­å¿ƒåƒç´ çš„censuså€¼
+			// ÖĞĞÄÏñËØµÄcensusÖµ
 			census[i * width + j] = census_val;
 		}
 	}
 }
 
-void adcensus_util::census_transform_dx2d(const uint8 *source, vector<uint64>& census, const sint32 &width, const sint32 &height)
+void adcensus_util::census_transform_dx2d(const uint8* source, vector<uint64>& census, const sint32& width, const sint32& height)
 {
 	// d = max(x0-x3);
 	sint32 d = 10;
-	if (source == nullptr || census.empty() || width <= 4 * d + 1||height <= 2*d + 1)
+	if (source == nullptr || census.empty() || width <= 4 * d + 1 || height <= 2 * d + 1)
 	{
 		return;
 	}
 
-	// é€åƒç´ è®¡ç®—censuså€¼
+	// ÖğÏñËØ¼ÆËãcensusÖµ
 	for (sint32 i = d; i < height - d; i++)
 	{
 		for (sint32 j = 2 * d; j < width - 2 * d; j++)
 		{
 
-			// ä¸­å¿ƒåƒç´ å€¼
+			// ÖĞĞÄÏñËØÖµ
 			const uint8 gray_center = source[i * width + j];
 
-			// éå†å¤§å°ä¸º5x5çš„çª—å£å†…é‚»åŸŸåƒç´ ï¼Œé€ä¸€æ¯”è¾ƒåƒç´ å€¼ä¸ä¸­å¿ƒåƒç´ å€¼çš„çš„å¤§å°ï¼Œè®¡ç®—censuså€¼
+			// ±éÀú´óĞ¡Îª5x5µÄ´°¿ÚÄÚÁÚÓòÏñËØ£¬ÖğÒ»±È½ÏÏñËØÖµÓëÖĞĞÄÏñËØÖµµÄµÄ´óĞ¡£¬¼ÆËãcensusÖµ
 			uint32 census_val = 0u;
 			for (sint32 r = -d; r <= d; r++)
 			{
-				for (sint32 c = -2*d; c <= 2*d; c++)
+				for (sint32 c = -2 * d; c <= 2 * d; c++)
 				{
-					census_val <<= 1; // å·¦ç§» value*2
+					census_val <<= 1; // ×óÒÆ value*2
 					const uint8 gray = source[(i + r) * width + j + c];
 					if (gray < gray_center)
 					{
@@ -108,28 +108,28 @@ void adcensus_util::census_transform_dx2d(const uint8 *source, vector<uint64>& c
 				}
 			}
 
-			// ä¸­å¿ƒåƒç´ çš„censuså€¼
+			// ÖĞĞÄÏñËØµÄcensusÖµ
 			census[i * width + j] = census_val;
 		}
 	}
 };
 
-void adcensus_util::census_transform_9x7_improved(const uint8 *source, vector<uint64> &census, const sint32 &width, const sint32 &height)
+void adcensus_util::census_transform_9x7_improved(const uint8* source, vector<uint64>& census, const sint32& width, const sint32& height)
 {
 	if (source == nullptr || census.empty() || width <= 9 || height <= 7)
 	{
 		return;
 	}
 
-	// é€åƒç´ è®¡ç®—censuså€¼
+	// ÖğÏñËØ¼ÆËãcensusÖµ
 	for (sint32 i = 4; i < height - 4; i++)
 	{
 		for (sint32 j = 3; j < width - 3; j++)
 		{
 
-			// ä¸­å¿ƒåƒç´ å€¼
+			// ÖĞĞÄÏñËØÖµ
 			const uint8 gray_center_original = source[i * width + j];
-			// åŒºå—å‡å€¼
+			// Çø¿é¾ùÖµ
 
 			uint8 u1_ = 0, u2_ = 0, u3_ = 0, u4_ = 0;
 			for (sint32 r = -4; r <= 0; r++)
@@ -161,7 +161,7 @@ void adcensus_util::census_transform_9x7_improved(const uint8 *source, vector<ui
 				}
 			}
 
-			// åŒºå—å›¾åƒå‡åŒ€åº¦
+			// Çø¿éÍ¼Ïñ¾ùÔÈ¶È
 			uint8 u1 = 0, u2 = 0, u3 = 0, u4 = 0;
 			for (sint32 r = -4; r <= 0; r++)
 			{
@@ -192,8 +192,8 @@ void adcensus_util::census_transform_9x7_improved(const uint8 *source, vector<ui
 				}
 			}
 
-			const uint8 uMax = std::max(std::max(u1, u2), std::max(u3, u4));
-			const uint8 uMin = std::min(std::min(u1, u2), std::min(u3, u4));
+			uint8 uMax = std::max(std::max(u1, u2), std::max(u3, u4));
+			uint8 uMin = std::min(std::min(u1, u2), std::min(u3, u4));
 			uint8 uMax_, uMin_;
 			if (uMax == u1)
 			{
@@ -230,10 +230,10 @@ void adcensus_util::census_transform_9x7_improved(const uint8 *source, vector<ui
 			}
 
 			const uint8 gray_center = (uMax_ + uMin_ - 2 * gray_center_original) / (2 * 20 - 2);
-			// ä¸­å¿ƒåƒç´ å€¼
+			// ÖĞĞÄÏñËØÖµ
 			// const uint8 gray_center = source[i * width + j];
 
-			// éå†å¤§å°ä¸º9x7çš„çª—å£å†…é‚»åŸŸåƒç´ ï¼Œé€ä¸€æ¯”è¾ƒåƒç´ å€¼ä¸ä¸­å¿ƒåƒç´ å€¼çš„çš„å¤§å°ï¼Œè®¡ç®—censuså€¼
+			// ±éÀú´óĞ¡Îª9x7µÄ´°¿ÚÄÚÁÚÓòÏñËØ£¬ÖğÒ»±È½ÏÏñËØÖµÓëÖĞĞÄÏñËØÖµµÄµÄ´óĞ¡£¬¼ÆËãcensusÖµ
 			uint64 census_val = 0u;
 			for (sint32 r = -4; r <= 4; r++)
 			{
@@ -248,13 +248,13 @@ void adcensus_util::census_transform_9x7_improved(const uint8 *source, vector<ui
 				}
 			}
 
-			// ä¸­å¿ƒåƒç´ çš„censuså€¼
+			// ÖĞĞÄÏñËØµÄcensusÖµ
 			census[i * width + j] = census_val;
 		}
 	}
 }
 
-uint8 adcensus_util::Hamming64(const uint64 &x, const uint64 &y)
+uint8 adcensus_util::Hamming64(const uint64& x, const uint64& y)
 {
 	uint64 dist = 0, val = x ^ y;
 
@@ -268,7 +268,7 @@ uint8 adcensus_util::Hamming64(const uint64 &x, const uint64 &y)
 	return static_cast<uint8>(dist);
 }
 
-void adcensus_util::MedianFilter(const float32 *in, float32 *out, const sint32 &width, const sint32 &height, const sint32 wnd_size)
+void adcensus_util::MedianFilter(const float32* in, float32* out, const sint32& width, const sint32& height, const sint32 wnd_size)
 {
 	const sint32 radius = wnd_size / 2;
 	const sint32 size = wnd_size * wnd_size;

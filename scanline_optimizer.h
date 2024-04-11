@@ -6,10 +6,8 @@
 
 #ifndef AD_CENSUS_SCANLNE_OPTIMIZER_H_
 #define AD_CENSUS_SCANLNE_OPTIMIZER_H_
-
-#include <algorithm>
-
 #include "adcensus_types.h"
+#include <algorithm>
 
 /**
  * \brief 扫描线优化器

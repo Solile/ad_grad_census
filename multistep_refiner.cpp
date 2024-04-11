@@ -7,13 +7,13 @@
 #include "multistep_refiner.h"
 #include "adcensus_util.h"
 
-MultiStepRefiner::MultiStepRefiner(): width_(0), height_(0), img_left_(nullptr), cost_(nullptr),
-                                      cross_arms_(nullptr),
-                                      disp_left_(nullptr), disp_right_(nullptr),
-                                      min_disparity_(0), max_disparity_(0),
-                                      irv_ts_(0), irv_th_(0), lrcheck_thres_(0),
-                                      do_lr_check_(false), do_region_voting_(false),
-                                      do_interpolating_(false), do_discontinuity_adjustment_(false) { }
+MultiStepRefiner::MultiStepRefiner() : width_(0), height_(0), img_left_(nullptr), cost_(nullptr),
+cross_arms_(nullptr),
+disp_left_(nullptr), disp_right_(nullptr),
+min_disparity_(0), max_disparity_(0),
+irv_ts_(0), irv_th_(0), lrcheck_thres_(0),
+do_lr_check_(false), do_region_voting_(false),
+do_interpolating_(false), do_discontinuity_adjustment_(false) { }
 
 MultiStepRefiner::~MultiStepRefiner()
 {
@@ -27,24 +27,24 @@ bool MultiStepRefiner::Initialize(const sint32& width, const sint32& height)
 		return false;
 	}
 
-	// åˆå§‹åŒ–è¾¹ç¼˜æ•°æ®
+	// ³õÊ¼»¯±ßÔµÊı¾İ
 	vec_edge_left_.clear();
-	vec_edge_left_.resize(width*height);
-	
+	vec_edge_left_.resize(width * height);
+
 	return true;
 }
 
-void MultiStepRefiner::SetData(const uint8* img_left, float32* cost,const CrossArm* cross_arms, float32* disp_left, float32* disp_right)
+void MultiStepRefiner::SetData(const uint8* img_left, float32* cost, const CrossArm* cross_arms, float32* disp_left, float32* disp_right)
 {
 	img_left_ = img_left;
-	cost_ = cost; 
+	cost_ = cost;
 	cross_arms_ = cross_arms;
 	disp_left_ = disp_left;
-	disp_right_= disp_right;
+	disp_right_ = disp_right;
 }
 
 void MultiStepRefiner::SetParam(const sint32& min_disparity, const sint32& max_disparity, const sint32& irv_ts, const float32& irv_th, const float32& lrcheck_thres,
-								const bool& do_lr_check, const bool& do_region_voting, const bool& do_interpolating, const bool& do_discontinuity_adjustment)
+	const bool& do_lr_check, const bool& do_region_voting, const bool& do_interpolating, const bool& do_discontinuity_adjustment)
 {
 	min_disparity_ = min_disparity;
 	max_disparity_ = max_disparity;
@@ -94,31 +94,31 @@ void MultiStepRefiner::OutlierDetection()
 
 	const float32& threshold = lrcheck_thres_;
 
-	// é®æŒ¡åŒºåƒç´ å’Œè¯¯åŒ¹é…åŒºåƒç´ 
+	// ÕÚµ²ÇøÏñËØºÍÎóÆ¥ÅäÇøÏñËØ
 	auto& occlusions = occlusions_;
 	auto& mismatches = mismatches_;
 	occlusions.clear();
 	mismatches.clear();
 
-	// ---å·¦å³ä¸€è‡´æ€§æ£€æŸ¥
+	// ---×óÓÒÒ»ÖÂĞÔ¼ì²é
 	for (sint32 y = 0; y < height; y++) {
 		for (sint32 x = 0; x < width; x++) {
-			// å·¦å½±åƒè§†å·®å€¼
+			// ×óÓ°ÏñÊÓ²îÖµ
 			auto& disp = disp_left_[y * width + x];
 			if (disp == Invalid_Float) {
 				mismatches.emplace_back(x, y);
 				continue;
 			}
 
-			// æ ¹æ®è§†å·®å€¼æ‰¾åˆ°å³å½±åƒä¸Šå¯¹åº”çš„åŒååƒç´ 
+			// ¸ù¾İÊÓ²îÖµÕÒµ½ÓÒÓ°ÏñÉÏ¶ÔÓ¦µÄÍ¬ÃûÏñËØ
 			const auto col_right = lround(x - disp);
 			if (col_right >= 0 && col_right < width) {
-				// å³å½±åƒä¸ŠåŒååƒç´ çš„è§†å·®å€¼
+				// ÓÒÓ°ÏñÉÏÍ¬ÃûÏñËØµÄÊÓ²îÖµ
 				const auto& disp_r = disp_right_[y * width + col_right];
-				// åˆ¤æ–­ä¸¤ä¸ªè§†å·®å€¼æ˜¯å¦ä¸€è‡´ï¼ˆå·®å€¼åœ¨é˜ˆå€¼å†…ï¼‰
+				// ÅĞ¶ÏÁ½¸öÊÓ²îÖµÊÇ·ñÒ»ÖÂ£¨²îÖµÔÚãĞÖµÄÚ£©
 				if (abs(disp - disp_r) > threshold) {
-					// åŒºåˆ†é®æŒ¡åŒºå’Œè¯¯åŒ¹é…åŒº
-					// é€šè¿‡å³å½±åƒè§†å·®ç®—å‡ºåœ¨å·¦å½±åƒçš„åŒ¹é…åƒç´ ï¼Œå¹¶è·å–è§†å·®disp_rl
+					// Çø·ÖÕÚµ²ÇøºÍÎóÆ¥ÅäÇø
+					// Í¨¹ıÓÒÓ°ÏñÊÓ²îËã³öÔÚ×óÓ°ÏñµÄÆ¥ÅäÏñËØ£¬²¢»ñÈ¡ÊÓ²îdisp_rl
 					// if(disp_rl > disp) 
 					//		pixel in occlusions
 					// else 
@@ -137,12 +137,12 @@ void MultiStepRefiner::OutlierDetection()
 						mismatches.emplace_back(x, y);
 					}
 
-					// è®©è§†å·®å€¼æ— æ•ˆ
+					// ÈÃÊÓ²îÖµÎŞĞ§
 					disp = Invalid_Float;
 				}
 			}
 			else {
-				// é€šè¿‡è§†å·®å€¼åœ¨å³å½±åƒä¸Šæ‰¾ä¸åˆ°åŒååƒç´ ï¼ˆè¶…å‡ºå½±åƒèŒƒå›´ï¼‰
+				// Í¨¹ıÊÓ²îÖµÔÚÓÒÓ°ÏñÉÏÕÒ²»µ½Í¬ÃûÏñËØ£¨³¬³öÓ°Ïñ·¶Î§£©
 				disp = Invalid_Float;
 				mismatches.emplace_back(x, y);
 			}
@@ -155,17 +155,17 @@ void MultiStepRefiner::IterativeRegionVoting()
 	const sint32 width = width_;
 
 	const auto disp_range = max_disparity_ - min_disparity_;
-	if(disp_range <= 0) {
+	if (disp_range <= 0) {
 		return;
 	}
 	const auto arms = cross_arms_;
 
-	// ç›´æ–¹å›¾
-	vector<sint32> histogram(disp_range,0);
+	// Ö±·½Í¼
+	vector<sint32> histogram(disp_range, 0);
 
-	// è¿­ä»£5æ¬¡
+	// µü´ú5´Î
 	const sint32 num_iters = 5;
-	
+
 	for (sint32 it = 0; it < num_iters; it++) {
 		for (sint32 k = 0; k < 2; k++) {
 			auto& trg_pixels = (k == 0) ? mismatches_ : occlusions_;
@@ -173,17 +173,17 @@ void MultiStepRefiner::IterativeRegionVoting()
 				const sint32& x = pix.first;
 				const sint32& y = pix.second;
 				auto& disp = disp_left_[y * width + x];
-				if(disp != Invalid_Float) {
+				if (disp != Invalid_Float) {
 					continue;
 				}
 
 				// init histogram
 				memset(&histogram[0], 0, disp_range * sizeof(sint32));
 
-				// è®¡ç®—æ”¯æŒåŒºçš„è§†å·®ç›´æ–¹å›¾
-				// è·å–arm
+				// ¼ÆËãÖ§³ÖÇøµÄÊÓ²îÖ±·½Í¼
+				// »ñÈ¡arm
 				auto& arm = arms[y * width + x];
-				// éå†æ”¯æŒåŒºåƒç´ è§†å·®ï¼Œç»Ÿè®¡ç›´æ–¹å›¾
+				// ±éÀúÖ§³ÖÇøÏñËØÊÓ²î£¬Í³¼ÆÖ±·½Í¼
 				for (sint32 t = -arm.top; t <= arm.bottom; t++) {
 					const sint32& yt = y + t;
 					auto& arm2 = arms[yt * width_ + x];
@@ -195,7 +195,7 @@ void MultiStepRefiner::IterativeRegionVoting()
 						}
 					}
 				}
-				// è®¡ç®—ç›´æ–¹å›¾å³°å€¼å¯¹åº”çš„è§†å·®
+				// ¼ÆËãÖ±·½Í¼·åÖµ¶ÔÓ¦µÄÊÓ²î
 				sint32 best_disp = 0, count = 0;
 				sint32 max_ht = 0;
 				for (sint32 d = 0; d < disp_range; d++) {
@@ -213,11 +213,11 @@ void MultiStepRefiner::IterativeRegionVoting()
 					}
 				}
 			}
-			// åˆ é™¤å·²å¡«å……åƒç´ 
+			// É¾³ıÒÑÌî³äÏñËØ
 			for (auto it = trg_pixels.begin(); it != trg_pixels.end();) {
 				const sint32 x = it->first;
 				const sint32 y = it->second;
-				if(disp_left_[y * width + x]!=Invalid_Float) {
+				if (disp_left_[y * width + x] != Invalid_Float) {
 					it = trg_pixels.erase(it);
 				}
 				else { ++it; }
@@ -232,7 +232,7 @@ void MultiStepRefiner::ProperInterpolation()
 	const sint32 height = height_;
 
 	const float32 pi = 3.1415926f;
-	// æœ€å¤§æœç´¢è¡Œç¨‹ï¼Œæ²¡æœ‰å¿…è¦æœç´¢è¿‡è¿œçš„åƒç´ 
+	// ×î´óËÑË÷ĞĞ³Ì£¬Ã»ÓĞ±ØÒªËÑË÷¹ıÔ¶µÄÏñËØ
 	const sint32 max_search_length = std::max(abs(max_disparity_), abs(min_disparity_));
 
 	std::vector<pair<sint32, float32>> disp_collects;
@@ -243,13 +243,13 @@ void MultiStepRefiner::ProperInterpolation()
 		}
 		std::vector<float32> fill_disps(trg_pixels.size());
 
-		// éå†å¾…å¤„ç†åƒç´ 
+		// ±éÀú´ı´¦ÀíÏñËØ
 		for (auto n = 0u; n < trg_pixels.size(); n++) {
 			auto& pix = trg_pixels[n];
 			const sint32 x = pix.first;
 			const sint32 y = pix.second;
 
-			// æ”¶é›†16ä¸ªæ–¹å‘ä¸Šé‡åˆ°çš„é¦–ä¸ªæœ‰æ•ˆè§†å·®å€¼
+			// ÊÕ¼¯16¸ö·½ÏòÉÏÓöµ½µÄÊ×¸öÓĞĞ§ÊÓ²îÖµ
 			disp_collects.clear();
 			double ang = 0.0;
 			for (sint32 s = 0; s < 16; s++) {
@@ -258,7 +258,7 @@ void MultiStepRefiner::ProperInterpolation()
 				for (sint32 m = 1; m < max_search_length; m++) {
 					const sint32 yy = lround(y + m * sina);
 					const sint32 xx = lround(x + m * cosa);
-					if (yy < 0 || yy >= height || xx < 0 || xx >= width) { break;}
+					if (yy < 0 || yy >= height || xx < 0 || xx >= width) { break; }
 					const auto& d = disp_left_[yy * width + xx];
 					if (d != Invalid_Float) {
 						disp_collects.emplace_back(yy * width * 3 + 3 * xx, d);
@@ -271,12 +271,12 @@ void MultiStepRefiner::ProperInterpolation()
 				continue;
 			}
 
-			// å¦‚æœæ˜¯è¯¯åŒ¹é…åŒºï¼Œåˆ™é€‰æ‹©é¢œè‰²æœ€ç›¸è¿‘çš„åƒç´ è§†å·®å€¼
-			// å¦‚æœæ˜¯é®æŒ¡åŒºï¼Œåˆ™é€‰æ‹©æœ€å°è§†å·®å€¼
+			// Èç¹ûÊÇÎóÆ¥ÅäÇø£¬ÔòÑ¡ÔñÑÕÉ«×îÏà½üµÄÏñËØÊÓ²îÖµ
+			// Èç¹ûÊÇÕÚµ²Çø£¬ÔòÑ¡Ôñ×îĞ¡ÊÓ²îÖµ
 			if (k == 0) {
 				sint32 min_dist = 9999;
 				float32 d = 0.0f;
-				const auto color = ADColor(img_left_[y*width * 3 + 3 * x], img_left_[y*width * 3 + 3 * x + 1], img_left_[y*width * 3 + 3 * x + 2]);
+				const auto color = ADColor(img_left_[y * width * 3 + 3 * x], img_left_[y * width * 3 + 3 * x + 1], img_left_[y * width * 3 + 3 * x + 2]);
 				for (auto& dc : disp_collects) {
 					const auto color2 = ADColor(img_left_[dc.first], img_left_[dc.first + 1], img_left_[dc.first + 2]);
 					const auto dist = abs(color.r - color2.r) + abs(color.g - color2.g) + abs(color.b - color2.b);
@@ -312,27 +312,27 @@ void MultiStepRefiner::DepthDiscontinuityAdjustment()
 	if (disp_range <= 0) {
 		return;
 	}
-	
-	// å¯¹è§†å·®å›¾åšè¾¹ç¼˜æ£€æµ‹
-	// è¾¹ç¼˜æ£€æµ‹çš„æ–¹æ³•æ˜¯çµæ´»çš„ï¼Œè¿™é‡Œé€‰æ‹©sobelç®—å­
+
+	// ¶ÔÊÓ²îÍ¼×ö±ßÔµ¼ì²â
+	// ±ßÔµ¼ì²âµÄ·½·¨ÊÇÁé»îµÄ£¬ÕâÀïÑ¡ÔñsobelËã×Ó
 	const float32 edge_thres = 5.0f;
 	EdgeDetect(&vec_edge_left_[0], disp_left_, width, height, edge_thres);
 
-	// è°ƒæ•´è¾¹ç¼˜åƒç´ çš„è§†å·®
+	// µ÷Õû±ßÔµÏñËØµÄÊÓ²î
 	for (sint32 y = 0; y < height; y++) {
 		for (sint32 x = 1; x < width - 1; x++) {
-			const auto& e_label = vec_edge_left_[y*width + x];
+			const auto& e_label = vec_edge_left_[y * width + x];
 			if (e_label == 1) {
-				const auto disp_ptr = disp_left_ + y*width;
+				const auto disp_ptr = disp_left_ + y * width;
 				float32& d = disp_ptr[x];
 				if (d != Invalid_Float) {
 					const sint32& di = lround(d);
-					const auto cost_ptr = cost_ + y*width*disp_range + x*disp_range;
+					const auto cost_ptr = cost_ + y * width * disp_range + x * disp_range;
 					float32 c0 = cost_ptr[di];
 
-					// è®°å½•å·¦å³ä¸¤è¾¹åƒç´ çš„è§†å·®å€¼å’Œä»£ä»·å€¼
-					// é€‰æ‹©ä»£ä»·æœ€å°çš„åƒç´ è§†å·®å€¼
-					for (int k = 0; k<2; k++) {
+					// ¼ÇÂ¼×óÓÒÁ½±ßÏñËØµÄÊÓ²îÖµºÍ´ú¼ÛÖµ
+					// Ñ¡Ôñ´ú¼Û×îĞ¡µÄÏñËØÊÓ²îÖµ
+					for (int k = 0; k < 2; k++) {
 						const sint32 x2 = (k == 0) ? x - 1 : x + 1;
 						const float32& d2 = disp_ptr[x2];
 						const sint32& d2i = lround(d2);
@@ -348,13 +348,13 @@ void MultiStepRefiner::DepthDiscontinuityAdjustment()
 			}
 		}
 	}
-	
+
 }
 
 void MultiStepRefiner::EdgeDetect(uint8* edge_mask, const float32* disp_ptr, const sint32& width, const sint32& height, const float32 threshold)
 {
-	memset(edge_mask, 0, width*height * sizeof(uint8));
-	// sobelç®—å­
+	memset(edge_mask, 0, width * height * sizeof(uint8));
+	// sobelËã×Ó
 	for (int y = 1; y < height - 1; y++) {
 		for (int x = 1; x < width - 1; x++) {
 			const auto grad_x = (-disp_ptr[(y - 1) * width + x - 1] + disp_ptr[(y - 1) * width + x + 1]) +
@@ -364,7 +364,7 @@ void MultiStepRefiner::EdgeDetect(uint8* edge_mask, const float32* disp_ptr, con
 				(disp_ptr[(y + 1) * width + x - 1] + 2 * disp_ptr[(y + 1) * width + x] + disp_ptr[(y + 1) * width + x + 1]);
 			const auto grad = abs(grad_x) + abs(grad_y);
 			if (grad > threshold) {
-				edge_mask[y*width + x] = 1;
+				edge_mask[y * width + x] = 1;
 			}
 		}
 	}

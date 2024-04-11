@@ -1,4 +1,4 @@
-#include "sgm_types.h"
+#include "adcensus_types.h"
 #include <vector>
 #include <iostream>
 #include <opencv2/highgui.hpp>

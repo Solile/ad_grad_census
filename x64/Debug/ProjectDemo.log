@@ -1,0 +1,70 @@
+﻿  surf_catchAndmatch.cpp
+D:\C_project\ProjectDemo\surf_catchAndmatch.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  (编译源文件“surf_catchAndmatch.cpp”)
+  
+D:\C_project\ProjectDemo\adcensus_types.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  (编译源文件“surf_catchAndmatch.cpp”)
+  
+D:\OPENCV4.8\opencv\opencv_new_build\install\include\opencv2\xfeatures2d.hpp(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  (编译源文件“surf_catchAndmatch.cpp”)
+  
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244: “初始化”: 从“_Tp”转换到“_Ty1”，可能丢失数据
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:             _Tp=float
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:         ]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:         and
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:             _Ty1=int
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16): warning C4244:         ]
+  (编译源文件“surf_catchAndmatch.cpp”)
+  C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,16):
+  模板实例化上下文(最早的实例化上下文)为
+  	D:\C_project\ProjectDemo\surf_catchAndmatch.cpp(210,21):
+  	查看对正在编译的函数 模板 实例化“void std::vector<std::pair<int,int>,std::allocator<std::pair<int,int>>>::emplace_back<_Tp&,_Tp&>(_Tp &,_Tp &)”的引用
+          with
+          [
+              _Tp=float
+          ]
+  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\vector(862,24):
+  	查看对正在编译的函数 模板 实例化“_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<_Tp&,_Tp&>(_Tp &,_Tp &)”的引用
+          with
+          [
+              _Ty=std::pair<int,int>,
+              _Tp=float
+          ]
+  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\vector(780,20):
+  	查看对正在编译的函数 模板 实例化“_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<_Tp&,_Tp&>(_Tp &,_Tp &)”的引用
+          with
+          [
+              _Ty=std::pair<int,int>,
+              _Tp=float
+          ]
+  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\vector(795,13):
+  	查看对正在编译的函数 模板 实例化“void std::_Construct_in_place<std::pair<int,int>,_Tp&,_Tp&>(_Ty &,_Tp &,_Tp &) noexcept”的引用
+          with
+          [
+              _Tp=float,
+              _Ty=std::pair<int,int>
+          ]
+  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\xutility(255,61):
+  	查看对正在编译的函数 模板 实例化“std::pair<int,int>::pair<_Tp&,_Tp&,0>(_Other1,_Other2) noexcept”的引用
+          with
+          [
+              _Tp=float,
+              _Other1=float &,
+              _Other2=float &
+          ]
+  
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244: “初始化”: 从“_Tp”转换到“_Ty2”，可能丢失数据
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:             _Tp=float
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:         ]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:         and
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:             _Ty2=int
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\utility(250,54): warning C4244:         ]
+  (编译源文件“surf_catchAndmatch.cpp”)
+  
+  ProjectDemo.vcxproj -> D:\C_project\ProjectDemo\x64\Debug\ProjectDemo.exe

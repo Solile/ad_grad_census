@@ -1,9 +1,8 @@
 #include <chrono>
 
 #include "surf_catchAndmatch.h"
-#include "sgm_util.h"
 
-SLAM::SLAM() : width_(0), height_(0), img_left_(nullptr), img_right_(nullptr), is_Initialized_(false){};
+SLAM::SLAM() : width_(0), height_(0), img_left_(nullptr), img_right_(nullptr), is_Initialized_(false) {};
 SLAM::~SLAM()
 {
     Release();
@@ -12,17 +11,17 @@ SLAM::~SLAM()
 
 void SLAM::Release()
 {
-    // é‡Šæ”¾å†…å­˜
+    // ÊÍ·ÅÄÚ´æ
     SAFE_DELETE(disp_left_);
 };
 
-bool SLAM::Initialize(const sint32 &width, const sint32 &height, const SLAMOption &option)
+bool SLAM::Initialize(const sint32& width, const sint32& height, const SLAMOption& option)
 {
-    //... èµ‹å€¼
-    // å½±åƒå°ºå¯¸
+    //... ¸³Öµ
+    // Ó°Ïñ³ß´ç
     width_ = width;
     height_ = height;
-    // SLAMæ–¹å¼å‚æ•°
+    // SLAM·½Ê½²ÎÊı
     option_ = option;
 
     if (width == 0 || height == 0)
@@ -30,14 +29,14 @@ bool SLAM::Initialize(const sint32 &width, const sint32 &height, const SLAMOptio
         return false;
     }
 
-    //... å¼€è¾Ÿå†…å­˜ç©ºé—´
+    //... ¿ª±ÙÄÚ´æ¿Õ¼ä
     const sint32 img_size = width * height;
 
-    // åŒ¹é…ä»£ä»·(åˆå§‹/èšåˆ)
-    gray_left_.create(height, width,CV_8UC1);
+    // Æ¥Åä´ú¼Û(³õÊ¼/¾ÛºÏ)
+    gray_left_.create(height, width, CV_8UC1);
     gray_right_.create(height, width, CV_8UC1);
 
-    // è§†å·®å›¾
+    // ÊÓ²îÍ¼
     disp_left_ = new float32[img_size]();
 
     is_Initialized_ = disp_left_;
@@ -45,19 +44,19 @@ bool SLAM::Initialize(const sint32 &width, const sint32 &height, const SLAMOptio
     return is_Initialized_;
 };
 
-bool SLAM::Reset(const sint32 &width, const sint32 &height, const SLAMOption &option)
+bool SLAM::Reset(const sint32& width, const sint32& height, const SLAMOption& option)
 {
-    // é‡Šæ”¾å†…å­˜
+    // ÊÍ·ÅÄÚ´æ
     Release();
 
-    // é‡ç½®åˆå§‹åŒ–æ ‡è®°
+    // ÖØÖÃ³õÊ¼»¯±ê¼Ç
     is_Initialized_ = false;
 
-    // åˆå§‹åŒ–
+    // ³õÊ¼»¯
     return Initialize(width, height, option);
 };
 
-bool SLAM::Match(const uint8 *img_left, const uint8 *img_right, float32 *disp_left, std::vector<std::pair<int, int>> left_matches)
+bool SLAM::Match(const uint8* img_left, const uint8* img_right, float32* disp_left, std::vector<std::pair<int, int>> left_matches)
 {
     if (!is_Initialized_)
     {
@@ -71,7 +70,7 @@ bool SLAM::Match(const uint8 *img_left, const uint8 *img_right, float32 *disp_le
     img_left_ = img_left;
     img_right_ = img_right;
 
-    // ç°åº¦æ•°æ®ï¼ˆå·¦å³å½±åƒï¼‰
+    // »Ò¶ÈÊı¾İ£¨×óÓÒÓ°Ïñ£©
     //cv::cvtColor(*img_left_, gray_left_, cv::COLOR_BGR2GRAY);
     //cv::cvtColor(*img_right_, gray_right_, cv::COLOR_BGR2GRAY);
     ComputeGray();
@@ -93,7 +92,7 @@ bool SLAM::Match(const uint8 *img_left, const uint8 *img_right, float32 *disp_le
     }
     Matcher_bruteForce();
 
-    // è¾“å‡ºè§†å·®å›¾
+    // Êä³öÊÓ²îÍ¼
     memcpy(disp_left, disp_left_, width_ * height_ * sizeof(float32));
     memcpy(left_matches.data(), left_matches_.data(), left_matches_.size());
 
@@ -117,7 +116,7 @@ void SLAM::ComputeGray()
             const auto r = img_right_[y * width_ + x + 2];
             gray_right_.at<uint8>(y, x) = uint8(r * 0.299 + g * 0.587 + b * 0.114);
         }
-    }  
+    }
 }
 
 void SLAM::orb_fearures()
@@ -138,7 +137,7 @@ void SLAM::sift_fearures()
 };
 void SLAM::surf_fearures()
 {
-    // minHessiançš„å€¼ä¸€èˆ¬åœ¨400~800ä¹‹é—´ã€‚minHessianæ˜¯ä¸€ä¸ªé˜ˆå€¼ï¼Œå®ƒå†³å®šäº†å“ªäº›å€¼æ˜¯ä½ æ¥å—çš„å…³é”®ç‚¹ã€‚minHessianå€¼è¶Šé«˜ï¼Œå¾—åˆ°çš„å…³é”®ç‚¹è¶Šå°‘ï¼Œä½†æ˜¯å…³é”®ç‚¹ä¹Ÿå°±æ›´å¥½ï¼Œåä¹‹ï¼ŒminHessianå€¼è¶Šä½ï¼Œå¾—åˆ°çš„å…³é”®ç‚¹è¶Šå¤šï¼Œå…³é”®ç‚¹è´¨é‡è¶Šå·®ã€‚
+    // minHessianµÄÖµÒ»°ãÔÚ400~800Ö®¼ä¡£minHessianÊÇÒ»¸öãĞÖµ£¬Ëü¾ö¶¨ÁËÄÄĞ©ÖµÊÇÄã½ÓÊÜµÄ¹Ø¼üµã¡£minHessianÖµÔ½¸ß£¬µÃµ½µÄ¹Ø¼üµãÔ½ÉÙ£¬µ«ÊÇ¹Ø¼üµãÒ²¾Í¸üºÃ£¬·´Ö®£¬minHessianÖµÔ½µÍ£¬µÃµ½µÄ¹Ø¼üµãÔ½¶à£¬¹Ø¼üµãÖÊÁ¿Ô½²î¡£
     int minHessian = 600;
     cv::Ptr<cv::xfeatures2d::SURF> surf = cv::xfeatures2d::SURF::create(minHessian);
     surf->detect(gray_left_, keypoints1, cv::Mat());
@@ -149,26 +148,26 @@ void SLAM::surf_fearures()
 
 void SLAM::Matcher_bruteForce()
 {
-    std::vector<cv::DMatch> matches;                      // å®šä¹‰å­˜æ”¾åŒ¹é…ç»“æœçš„å˜é‡
-    //cv::BFMatcher matcher(cv::NORM_HAMMING);              // å®šä¹‰ç‰¹å¾ç‚¹åŒ¹é…çš„ç±»ï¼Œä½¿ç”¨æ±‰æ˜è·ç¦»
+    std::vector<cv::DMatch> matches;                      // ¶¨Òå´æ·ÅÆ¥Åä½á¹ûµÄ±äÁ¿
+    //cv::BFMatcher matcher(cv::NORM_HAMMING);              // ¶¨ÒåÌØÕ÷µãÆ¥ÅäµÄÀà£¬Ê¹ÓÃººÃ÷¾àÀë
     cv::BFMatcher matcher(cv::NORM_L2);
-    matcher.match(descriptions1, descriptions2, matches); // è¿›è¡Œç‰¹å¾ç‚¹åŒ¹é…
+    matcher.match(descriptions1, descriptions2, matches); // ½øĞĞÌØÕ÷µãÆ¥Åä
 
     std::ostringstream ss;
-    ss << "matches =" << matches.size() << std::endl; // åŒ¹é…æˆåŠŸç‰¹å¾ç‚¹æ•°ç›®
+    ss << "matches =" << matches.size() << std::endl; // Æ¥Åä³É¹¦ÌØÕ÷µãÊıÄ¿
 
-    // åŒ¹é…ç‚¹å¯¹ç­›é€‰
+    // Æ¥Åäµã¶ÔÉ¸Ñ¡
     auto min_max = minmax_element(matches.begin(), matches.end(),
-                                  [](const cv::DMatch &m1, const cv::DMatch &m2)
-                                  { return m1.distance < m2.distance; });
+        [](const cv::DMatch& m1, const cv::DMatch& m2)
+        { return m1.distance < m2.distance; });
     double min_dist = min_max.first->distance;
     double max_dist = min_max.second->distance;
 
-    // è¾“å‡ºæ‰€æœ‰åŒ¹é…ç»“æœä¸­æœ€å¤§éŸ©æ˜è·ç¦»å’Œæœ€å°æ±‰æ˜è·ç¦»
+    // Êä³öËùÓĞÆ¥Åä½á¹ûÖĞ×î´óº«Ã÷¾àÀëºÍ×îĞ¡ººÃ÷¾àÀë
     ss << "min_dist=" << min_dist << std::endl;
     ss << "max_dist=" << max_dist << std::endl;
 
-    // å°†æ±‰æ˜è·ç¦»è¾ƒå¤§çš„åŒ¹é…ç‚¹å¯¹åˆ é™¤
+    // ½«ººÃ÷¾àÀë½Ï´óµÄÆ¥Åäµã¶ÔÉ¾³ı
     std::vector<cv::DMatch> good_matches;
     for (int i = 0; i < matches.size(); i++)
     {
@@ -178,7 +177,7 @@ void SLAM::Matcher_bruteForce()
         }
     }
 
-    // KNN åŒ¹é…
+    // KNN Æ¥Åä
     std::vector<std::vector<cv::DMatch>> knn_matches;
     const float ratio_thresh = 0.7f;
     std::vector<cv::DMatch> knn_good_matches;
@@ -191,7 +190,7 @@ void SLAM::Matcher_bruteForce()
         }
     }
 
-    std::cout << "good_match =" << good_matches.size() << std::endl; // å‰©ä½™ç‰¹å¾ç‚¹æ•°ç›®
+    std::cout << "good_match =" << good_matches.size() << std::endl; // Ê£ÓàÌØÕ÷µãÊıÄ¿
     std::cout << "Knn_good_match:" << knn_good_matches.size() << std::endl;
 
     std::vector<int> left_keypoints(good_matches.size()), right_keypoints(good_matches.size());
@@ -200,7 +199,7 @@ void SLAM::Matcher_bruteForce()
     {
         left_keypoints[i] = good_matches[i].queryIdx;
         right_keypoints[i] = good_matches[i].trainIdx;
-        //matchDepth[i] = good_matches[i].distance; //æ±‰æ˜è·ç¦»ï¼Œè¶Šå°è¶Šå¥½
+        //matchDepth[i] = good_matches[i].distance; //ººÃ÷¾àÀë£¬Ô½Ğ¡Ô½ºÃ
     }
 
     //std::vector<std::pair<int, int>> left_matches, right_matches;
@@ -227,7 +226,7 @@ void SLAM::Matcher_bruteForce()
         disparity[left_matches[k].first * width + left_matches[k].second] = matchDepth[k];
         std::cout << matchDepth[k] << std::endl;
     }
-    //// KNN åŒ¹é…
+    //// KNN Æ¥Åä
     //std::vector<std::vector<cv::DMatch>> knn_matches;
     //const float ratio_thresh = 0.7f;
     //std::vector<cv::DMatch> knn_good_matches;
@@ -240,43 +239,43 @@ void SLAM::Matcher_bruteForce()
     //    }
     //}
 
-    //std::cout << "KnnåŒ¹é…ä¸Šçš„çº¿æ¡æ•°:" << knn_good_matches.size() << std::endl;
+    //std::cout << "KnnÆ¥ÅäÉÏµÄÏßÌõÊı:" << knn_good_matches.size() << std::endl;
     // match_two_image(img_1, img_2, keypoints_1, keypoints_2, descriptors_1, descriptors_2);
 
-    // ç»˜åˆ¶åŒ¹é…ç»“æœ
+    // »æÖÆÆ¥Åä½á¹û
     cv::Mat imgMatches, imgKnnMatch;
     drawMatches(gray_left_, keypoints1, gray_left_, keypoints2, good_matches, imgMatches);
     drawMatches(gray_right_, keypoints1, gray_right_, keypoints2, knn_good_matches, imgKnnMatch);
 
-    // æ˜¾ç¤ºç»“æœ
-    cv::imwrite("D:\\dealpic\\orb_outimg.png", imgMatches);              // æœªç­›é€‰ç»“æœ
-    cv::imwrite("D:\\dealpic\\orb_Hamming_outimg.png", imgKnnMatch); // æœ€å°æ±‰æ˜è·ç¦»ç­›é€‰
+    // ÏÔÊ¾½á¹û
+    cv::imwrite("D:\\dealpic\\orb_outimg.png", imgMatches);              // Î´É¸Ñ¡½á¹û
+    cv::imwrite("D:\\dealpic\\orb_Hamming_outimg.png", imgKnnMatch); // ×îĞ¡ººÃ÷¾àÀëÉ¸Ñ¡
 };
 
 // void Matcher_bruteForce(cv::Mat img1, cv::Mat img2, std::vector<cv::KeyPoint> &keypoints1, std::vector<cv::KeyPoint> &keypoints2,
 //                         cv::Mat &descriptions1, cv::Mat &descriptions2)
 // {
-//     std::vector<cv::DMatch> matches;                      // å®šä¹‰å­˜æ”¾åŒ¹é…ç»“æœçš„å˜é‡
-//     cv::BFMatcher matcher(cv::NORM_HAMMING);              // å®šä¹‰ç‰¹å¾ç‚¹åŒ¹é…çš„ç±»ï¼Œä½¿ç”¨æ±‰æ˜è·ç¦»
-//     matcher.match(descriptions1, descriptions2, matches); // è¿›è¡Œç‰¹å¾ç‚¹åŒ¹é…
+//     std::vector<cv::DMatch> matches;                      // ¶¨Òå´æ·ÅÆ¥Åä½á¹ûµÄ±äÁ¿
+//     cv::BFMatcher matcher(cv::NORM_HAMMING);              // ¶¨ÒåÌØÕ÷µãÆ¥ÅäµÄÀà£¬Ê¹ÓÃººÃ÷¾àÀë
+//     matcher.match(descriptions1, descriptions2, matches); // ½øĞĞÌØÕ÷µãÆ¥Åä
 
 //     // cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create("BruteForce-Hamming");
-//     // matcher->match(descriptions1,descriptions2,matches);//è¿›è¡Œç‰¹å¾ç‚¹åŒ¹é…
+//     // matcher->match(descriptions1,descriptions2,matches);//½øĞĞÌØÕ÷µãÆ¥Åä
 //     std::ostringstream ss;
-//     ss << "matches =" << matches.size() << std::endl; // åŒ¹é…æˆåŠŸç‰¹å¾ç‚¹æ•°ç›®
+//     ss << "matches =" << matches.size() << std::endl; // Æ¥Åä³É¹¦ÌØÕ÷µãÊıÄ¿
 
-//     // åŒ¹é…ç‚¹å¯¹ç­›é€‰
+//     // Æ¥Åäµã¶ÔÉ¸Ñ¡
 //     auto min_max = minmax_element(matches.begin(), matches.end(),
 //                                   [](const cv::DMatch &m1, const cv::DMatch &m2)
 //                                   { return m1.distance < m2.distance; });
 //     double min_dist = min_max.first->distance;
 //     double max_dist = min_max.second->distance;
 
-//     // è¾“å‡ºæ‰€æœ‰åŒ¹é…ç»“æœä¸­æœ€å¤§éŸ©æ˜è·ç¦»å’Œæœ€å°æ±‰æ˜è·ç¦»
+//     // Êä³öËùÓĞÆ¥Åä½á¹ûÖĞ×î´óº«Ã÷¾àÀëºÍ×îĞ¡ººÃ÷¾àÀë
 //     ss << "min_dist=" << min_dist << std::endl;
 //     ss << "max_dist=" << max_dist << std::endl;
 
-//     // å°†æ±‰æ˜è·ç¦»è¾ƒå¤§çš„åŒ¹é…ç‚¹å¯¹åˆ é™¤
+//     // ½«ººÃ÷¾àÀë½Ï´óµÄÆ¥Åäµã¶ÔÉ¾³ı
 //     std::vector<cv::DMatch> good_matches;
 //     for (int i = 0; i < matches.size(); i++)
 //     {
@@ -285,7 +284,7 @@ void SLAM::Matcher_bruteForce()
 //             good_matches.push_back(matches[i]);
 //         }
 //     }
-//     ss << "good_match =" << good_matches.size() << std::endl; // å‰©ä½™ç‰¹å¾ç‚¹æ•°ç›®
+//     ss << "good_match =" << good_matches.size() << std::endl; // Ê£ÓàÌØÕ÷µãÊıÄ¿
 //     std::vector<int> left_keypoints(good_matches.size()), right_keypoints(good_matches.size());
 //     std::vector<float> matchDepth(good_matches.size());
 //     for (size_t i = 0; i < good_matches.size(); i++)
@@ -306,7 +305,7 @@ void SLAM::Matcher_bruteForce()
 //         // right_matches[i].second = keypoints2[right_keypoints[i]].pt.y;
 //     }
 
-//     // KNN åŒ¹é…
+//     // KNN Æ¥Åä
 //     std::vector<std::vector<cv::DMatch>> knn_matches;
 //     const float ratio_thresh = 0.7f;
 //     std::vector<cv::DMatch> good_matches;
@@ -319,17 +318,17 @@ void SLAM::Matcher_bruteForce()
 //         }
 //     }
 
-//     std::cout << "KnnåŒ¹é…ä¸Šçš„çº¿æ¡æ•°:" << good_matches.size() << std::endl;
+//     std::cout << "KnnÆ¥ÅäÉÏµÄÏßÌõÊı:" << good_matches.size() << std::endl;
 //     // match_two_image(img_1, img_2, keypoints_1, keypoints_2, descriptors_1, descriptors_2);
 
-//     // ç»˜åˆ¶åŒ¹é…ç»“æœ
+//     // »æÖÆÆ¥Åä½á¹û
 //     cv::Mat imgMatches, imgHammingMatch;
 //     drawMatches(img1, keypoints1, img2, keypoints2, matches, imgMatches);
 //     drawMatches(img1, keypoints1, img2, keypoints2, good_matches, imgHammingMatch);
 
-//     // æ˜¾ç¤ºç»“æœ
-//     cv::imwrite("D:\\dealpic\\3.5-1\\orb\\orb_outimg.png", imgMatches);              // æœªç­›é€‰ç»“æœ
-//     cv::imwrite("D:\\dealpic\\3.5-1\\orb\\orb_Hamming_outimg.png", imgHammingMatch); // æœ€å°æ±‰æ˜è·ç¦»ç­›é€‰
+//     // ÏÔÊ¾½á¹û
+//     cv::imwrite("D:\\dealpic\\3.5-1\\orb\\orb_outimg.png", imgMatches);              // Î´É¸Ñ¡½á¹û
+//     cv::imwrite("D:\\dealpic\\3.5-1\\orb\\orb_Hamming_outimg.png", imgHammingMatch); // ×îĞ¡ººÃ÷¾àÀëÉ¸Ñ¡
 // };
 // void orb_fearures(const cv::Mat &gray, std::vector<cv::KeyPoint> &keypoints, cv::Mat &descriptions)
 // {
@@ -350,7 +349,7 @@ void SLAM::Matcher_bruteForce()
 // };
 // void surf_fearures(const cv::Mat &gray, std::vector<cv::KeyPoint> &keypoints, cv::Mat &descriptions)
 // {
-//     // minHessiançš„å€¼ä¸€èˆ¬åœ¨400~800ä¹‹é—´ã€‚minHessianæ˜¯ä¸€ä¸ªé˜ˆå€¼ï¼Œå®ƒå†³å®šäº†å“ªäº›å€¼æ˜¯ä½ æ¥å—çš„å…³é”®ç‚¹ã€‚minHessianå€¼è¶Šé«˜ï¼Œå¾—åˆ°çš„å…³é”®ç‚¹è¶Šå°‘ï¼Œä½†æ˜¯å…³é”®ç‚¹ä¹Ÿå°±æ›´å¥½ï¼Œåä¹‹ï¼ŒminHessianå€¼è¶Šä½ï¼Œå¾—åˆ°çš„å…³é”®ç‚¹è¶Šå¤šï¼Œå…³é”®ç‚¹è´¨é‡è¶Šå·®ã€‚
+//     // minHessianµÄÖµÒ»°ãÔÚ400~800Ö®¼ä¡£minHessianÊÇÒ»¸öãĞÖµ£¬Ëü¾ö¶¨ÁËÄÄĞ©ÖµÊÇÄã½ÓÊÜµÄ¹Ø¼üµã¡£minHessianÖµÔ½¸ß£¬µÃµ½µÄ¹Ø¼üµãÔ½ÉÙ£¬µ«ÊÇ¹Ø¼üµãÒ²¾Í¸üºÃ£¬·´Ö®£¬minHessianÖµÔ½µÍ£¬µÃµ½µÄ¹Ø¼üµãÔ½¶à£¬¹Ø¼üµãÖÊÁ¿Ô½²î¡£
 //     int minHessian = 600;
 //     cv::Ptr<cv::xfeatures2d::SURF> surf = cv::xfeatures2d::SURF::create(minHessian);
 //     surf->detect(gray, keypoints, cv::Mat());
@@ -360,9 +359,9 @@ void SLAM::Matcher_bruteForce()
 // int main()
 // {
 
-//     // 1. è¯»å–å›¾ç‰‡
-//     const cv::Mat image1 = cv::imread("D:\\KindsOfProj\\åŒç›®å®éªŒ\\0314L\\water thing\\3-4.bmp", 0); // Load as grayscale
-//     const cv::Mat image2 = cv::imread("D:\\KindsOfProj\\åŒç›®å®éªŒ\\0314L\\water thing\\3-4.bmp", 0); // Load as grayscale
+//     // 1. ¶ÁÈ¡Í¼Æ¬
+//     const cv::Mat image1 = cv::imread("D:\\KindsOfProj\\Ë«Ä¿ÊµÑé\\0314L\\water thing\\3-4.bmp", 0); // Load as grayscale
+//     const cv::Mat image2 = cv::imread("D:\\KindsOfProj\\Ë«Ä¿ÊµÑé\\0314L\\water thing\\3-4.bmp", 0); // Load as grayscale
 //     assert(image1.data != nullptr && image2.data != nullptr);
 
 //     std::vector<cv::KeyPoint> keypoints1;

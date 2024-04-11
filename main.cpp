@@ -3,6 +3,7 @@
 * https://github.com/ethan-li-coding/AD-Census
 * Describe	: main
 */
+
 #include <iostream>
 #include "ADCensusStereo.h"
 #include <chrono>
@@ -16,17 +17,17 @@ using namespace std::chrono;
 //#pragma comment(lib,"opencv_world310.lib")
 //#endif
 
-/*æ˜¾ç¤ºè§†å·®å›¾*/
+/*ÏÔÊ¾ÊÓ²îÍ¼*/
 void ShowDisparityMap(const float32* disp_map, const sint32& width, const sint32& height, const std::string& name);
-/*ä¿å­˜è§†å·®å›¾*/
+/*±£´æÊÓ²îÍ¼*/
 void SaveDisparityMap(const float32* disp_map, const sint32& width, const sint32& height, const std::string& path);
-/*ä¿å­˜è§†å·®ç‚¹äº‘*/
+/*±£´æÊÓ²îµãÔÆ*/
 void SaveDisparityCloud(const uint8* img_bytes, const float32* disp_map, const sint32& width, const sint32& height, const std::string& path);
 
 /**
 * \brief
 * \param argv 3
-* \param argc argc[1]:å·¦å½±åƒè·¯å¾„ argc[2]: å³å½±åƒè·¯å¾„ argc[3]: æœ€å°è§†å·®[å¯é€‰ï¼Œé»˜è®¤0] argc[4]: æœ€å¤§è§†å·®[å¯é€‰ï¼Œé»˜è®¤64]
+* \param argc argc[1]:×óÓ°ÏñÂ·¾¶ argc[2]: ÓÒÓ°ÏñÂ·¾¶ argc[3]: ×îĞ¡ÊÓ²î[¿ÉÑ¡£¬Ä¬ÈÏ0] argc[4]: ×î´óÊÓ²î[¿ÉÑ¡£¬Ä¬ÈÏ64]
 * \param eg. ..\Data\cone\im2.png ..\Data\cone\im6.png 0 64
 * \param eg. ..\Data\Cloth3\view1.png ..\Data\Cloth3\view5.png 0 128
 * \return
@@ -34,13 +35,13 @@ void SaveDisparityCloud(const uint8* img_bytes, const float32* disp_map, const s
 int main(int argv, char** argc)
 {
 	//if (argv < 3) {
-	//	std::cout << "å‚æ•°è¿‡å°‘ï¼Œè¯·è‡³å°‘æŒ‡å®šå·¦å³å½±åƒè·¯å¾„ï¼" << std::endl;
+	//	std::cout << "²ÎÊı¹ıÉÙ£¬ÇëÖÁÉÙÖ¸¶¨×óÓÒÓ°ÏñÂ·¾¶£¡" << std::endl;
 	//	return -1;
 	//}
 
 	printf("Image Loading...");
-	//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·//
-	// è¯»å–å½±åƒ
+	//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤//
+	// ¶ÁÈ¡Ó°Ïñ
 	std::string path_left = "D:\\KindsOfProj\\database\\cones\\imL.png";
 	std::string path_right = "D:\\KindsOfProj\\database\\cones\\imR.png";
 
@@ -48,20 +49,20 @@ int main(int argv, char** argc)
 	cv::Mat img_right = cv::imread(path_right, cv::IMREAD_COLOR);
 
 	if (img_left.data == nullptr || img_right.data == nullptr) {
-		std::cout << "è¯»å–å½±åƒå¤±è´¥ï¼" << std::endl;
+		std::cout << "¶ÁÈ¡Ó°ÏñÊ§°Ü£¡" << std::endl;
 		return -1;
 	}
 	if (img_left.rows != img_right.rows || img_left.cols != img_right.cols) {
-		std::cout << "å·¦å³å½±åƒå°ºå¯¸ä¸ä¸€è‡´ï¼" << std::endl;
+		std::cout << "×óÓÒÓ°Ïñ³ß´ç²»Ò»ÖÂ£¡" << std::endl;
 		return -1;
 	}
 
 
-	//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·//
+	//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤//
 	const sint32 width = static_cast<uint32>(img_left.cols);
 	const sint32 height = static_cast<uint32>(img_right.rows);
 
-	// å·¦å³å½±åƒçš„å½©è‰²æ•°æ®
+	// ×óÓÒÓ°ÏñµÄ²ÊÉ«Êı¾İ
 	auto bytes_left = new uint8[width * height * 3];
 	auto bytes_right = new uint8[width * height * 3];
 	for (int i = 0; i < height; i++) {
@@ -76,32 +77,32 @@ int main(int argv, char** argc)
 	}
 	printf("Done!\n");
 
-	// AD-CensusåŒ¹é…å‚æ•°è®¾è®¡
+	// AD-CensusÆ¥Åä²ÎÊıÉè¼Æ
 	ADCensusOption ad_option;
-	// å€™é€‰è§†å·®èŒƒå›´
+	// ºòÑ¡ÊÓ²î·¶Î§
 	ad_option.min_disparity = argv < 4 ? 0 : atoi(argc[3]);
 	ad_option.max_disparity = argv < 5 ? 64 : atoi(argc[4]);
-	// ä¸€è‡´æ€§æ£€æŸ¥é˜ˆå€¼
+	// Ò»ÖÂĞÔ¼ì²éãĞÖµ
 	ad_option.lrcheck_thres = 1.0f;
 
-	// æ˜¯å¦æ‰§è¡Œä¸€è‡´æ€§æ£€æŸ¥
+	// ÊÇ·ñÖ´ĞĞÒ»ÖÂĞÔ¼ì²é
 	ad_option.do_lr_check = true;
 
-	// æ˜¯å¦æ‰§è¡Œè§†å·®å¡«å……
-	// è§†å·®å›¾å¡«å……çš„ç»“æœå¹¶ä¸å¯é ï¼Œè‹¥å·¥ç¨‹ï¼Œä¸å»ºè®®å¡«å……ï¼Œè‹¥ç§‘ç ”ï¼Œåˆ™å¯å¡«å……
+	// ÊÇ·ñÖ´ĞĞÊÓ²îÌî³ä
+	// ÊÓ²îÍ¼Ìî³äµÄ½á¹û²¢²»¿É¿¿£¬Èô¹¤³Ì£¬²»½¨ÒéÌî³ä£¬Èô¿ÆÑĞ£¬Ôò¿ÉÌî³ä
 	ad_option.do_filling = true;
-	
+
 	printf("w = %d, h = %d, d = [%d,%d]\n\n", width, height, ad_option.min_disparity, ad_option.max_disparity);
 
-	// å®šä¹‰AD-CensusåŒ¹é…ç±»å®ä¾‹
+	// ¶¨ÒåAD-CensusÆ¥ÅäÀàÊµÀı
 	ADCensusStereo ad_census;
 
 	printf("AD-Census Initializing...\n");
 	auto start = steady_clock::now();
-	//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·//
-	// åˆå§‹åŒ–
+	//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤//
+	// ³õÊ¼»¯
 	if (!ad_census.Initialize(width, height, ad_option)) {
-		std::cout << "AD-Censusåˆå§‹åŒ–å¤±è´¥ï¼" << std::endl;
+		std::cout << "AD-Census³õÊ¼»¯Ê§°Ü£¡" << std::endl;
 		return -2;
 	}
 	auto end = steady_clock::now();
@@ -109,30 +110,30 @@ int main(int argv, char** argc)
 	printf("AD-Census Initializing Done! Timing :	%lf s\n\n", tt.count() / 1000.0);
 
 	printf("AD-Census Matching...\n");
-	// disparityæ•°ç»„ä¿å­˜å­åƒç´ çš„è§†å·®ç»“æœ
+	// disparityÊı×é±£´æ×ÓÏñËØµÄÊÓ²î½á¹û
 	auto disparity = new float32[uint32(width * height)]();
 
 	start = steady_clock::now();
-	//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·//
-	// åŒ¹é…
+	//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤//
+	// Æ¥Åä
 	if (!ad_census.Match(bytes_left, bytes_right, disparity)) {
-		std::cout << "AD-CensusåŒ¹é…å¤±è´¥ï¼" << std::endl;
+		std::cout << "AD-CensusÆ¥ÅäÊ§°Ü£¡" << std::endl;
 		return -2;
 	}
 	end = steady_clock::now();
 	tt = duration_cast<milliseconds>(end - start);
 	printf("\nAD-Census Matching...Done! Timing :	%lf s\n", tt.count() / 1000.0);
 
-	//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·//
-	// æ˜¾ç¤ºè§†å·®å›¾
+	//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤//
+	// ÏÔÊ¾ÊÓ²îÍ¼
 	ShowDisparityMap(disparity, width, height, "disp-left");
-	// ä¿å­˜è§†å·®å›¾
+	// ±£´æÊÓ²îÍ¼
 	SaveDisparityMap(disparity, width, height, path_left);
 
 	cv::waitKey(0);
 
-	//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·//
-	// é‡Šæ”¾å†…å­˜
+	//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤//
+	// ÊÍ·ÅÄÚ´æ
 	delete[] disparity;
 	disparity = nullptr;
 	delete[] bytes_left;
@@ -146,7 +147,7 @@ int main(int argv, char** argc)
 
 void ShowDisparityMap(const float32* disp_map, const sint32& width, const sint32& height, const std::string& name)
 {
-	// æ˜¾ç¤ºè§†å·®å›¾
+	// ÏÔÊ¾ÊÓ²îÍ¼
 	const cv::Mat disp_mat = cv::Mat(height, width, CV_8UC1);
 	float32 min_disp = float32(width), max_disp = -float32(width);
 	for (sint32 i = 0; i < height; i++) {
@@ -179,7 +180,7 @@ void ShowDisparityMap(const float32* disp_map, const sint32& width, const sint32
 
 void SaveDisparityMap(const float32* disp_map, const sint32& width, const sint32& height, const std::string& path)
 {
-	// ä¿å­˜è§†å·®å›¾
+	// ±£´æÊÓ²îÍ¼
 	const cv::Mat disp_mat = cv::Mat(height, width, CV_8UC1);
 	float32 min_disp = float32(width), max_disp = -float32(width);
 	for (sint32 i = 0; i < height; i++) {
@@ -211,7 +212,7 @@ void SaveDisparityMap(const float32* disp_map, const sint32& width, const sint32
 
 void SaveDisparityCloud(const uint8* img_bytes, const float32* disp_map, const sint32& width, const sint32& height, const std::string& path)
 {
-	// ä¿å­˜è§†å·®ç‚¹äº‘(x,y,disp,r,g,b)
+	// ±£´æÊÓ²îµãÔÆ(x,y,disp,r,g,b)
 	FILE* fp_disp_cloud = nullptr;
 	fopen_s(&fp_disp_cloud, (path + "-cloud.txt").c_str(), "w");
 	if (fp_disp_cloud) {
